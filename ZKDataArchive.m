@@ -26,7 +26,7 @@
 }
 
 + (ZKDataArchive *) archiveWithArchiveData:(NSMutableData *) archiveData {
-	ZKDataArchive *archive = [[ZKDataArchive new] autorelease];
+	ZKDataArchive *archive = [ZKDataArchive new];
 	archive.data = archiveData;
 	archive.cdTrailer = [ZKCDTrailer recordWithData:archive.data];
 	if (archive.cdTrailer) {
@@ -57,7 +57,7 @@
 		if ([cdHeader isSymLink] || [cdHeader isDirectory]) {
 			[self.inflatedFiles addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 										   fileAttributes, ZKFileAttributesKey,
-										   [[[NSString alloc] initWithData:inflatedData encoding:NSUTF8StringEncoding] autorelease], ZKPathKey,
+										   [[NSString alloc] initWithData:inflatedData encoding:NSUTF8StringEncoding], ZKPathKey,
 										   nil]];
 		} else {
 			[self.inflatedFiles addObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -137,8 +137,8 @@
 			[self.fileManager createDirectoryAtPath:path
 						withIntermediateDirectories:YES attributes:nil error:nil];
 		else if ([[fileAttributes fileType] isEqualToString:NSFileTypeSymbolicLink]) {
-			NSString *symLinkDestinationPath = [[[NSString alloc] initWithData:inflatedData
-																	 encoding:NSUTF8StringEncoding] autorelease];
+			NSString *symLinkDestinationPath = [[NSString alloc] initWithData:inflatedData
+																	 encoding:NSUTF8StringEncoding];
 			[self.fileManager createSymbolicLinkAtPath:path
 								   withDestinationPath:symLinkDestinationPath error:nil];
 		}
@@ -234,7 +234,7 @@
 	}
 	
 	// create the local file header for the file
-	ZKLFHeader *lfHeaderData = [[ZKLFHeader new] autorelease];
+	ZKLFHeader *lfHeaderData = [ZKLFHeader new];
 	lfHeaderData.uncompressedSize = 0;
 	lfHeaderData.lastModDate = [self.fileManager zk_modificationDateForPath:path];
 	lfHeaderData.filename = relativePath;
@@ -266,7 +266,7 @@
 	}
 	
 	// create the central directory header and add it to central directory
-	ZKCDHeader *cdHeaderData = [[ZKCDHeader new] autorelease];
+	ZKCDHeader *cdHeaderData = [ZKCDHeader new];
 	cdHeaderData.uncompressedSize = lfHeaderData.uncompressedSize;
 	cdHeaderData.lastModDate = lfHeaderData.lastModDate;
 	cdHeaderData.crc = lfHeaderData.crc;
@@ -305,14 +305,14 @@
 	unsigned long long lfHeaderDataOffset = self.cdTrailer.offsetOfStartOfCentralDirectory;
 	[self.data setLength:lfHeaderDataOffset];
 	
-	ZKLFHeader *lfHeaderData = [[ZKLFHeader new] autorelease];
+	ZKLFHeader *lfHeaderData = [ZKLFHeader new];
 	lfHeaderData.uncompressedSize = [data length];
 	lfHeaderData.filename = filename;
 	lfHeaderData.filenameLength = [lfHeaderData.filename zk_precomposedUTF8Length];
 	lfHeaderData.crc = [data zk_crc32];
 	lfHeaderData.compressedSize = [deflatedData length];
 	
-	ZKCDHeader *cdHeaderData = [[ZKCDHeader new] autorelease];
+	ZKCDHeader *cdHeaderData = [ZKCDHeader new];
 	cdHeaderData.uncompressedSize = lfHeaderData.uncompressedSize;
 	cdHeaderData.crc = lfHeaderData.crc;
 	cdHeaderData.compressedSize = lfHeaderData.compressedSize;
@@ -359,18 +359,7 @@
 	return self;
 }
 
-- (void) dealloc {
-	self.data = nil;
-	self.inflatedFiles = nil;
-	[super dealloc];
-}
 
-- (void) finalize {
-	self.data = nil;
-	[self.inflatedFiles removeAllObjects];
-	self.inflatedFiles = nil;
-	[super finalize];
-}
 
 @synthesize data = _data, inflatedFiles = _inflatedFiles;
 

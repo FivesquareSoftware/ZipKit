@@ -16,7 +16,6 @@
 		[fm createFileAtPath:path contents:nil attributes:nil];
 	}
 	NSFileHandle *fileHandle = [self fileHandleForWritingAtPath:path];
-    [fm release];
     return fileHandle;
 }
 

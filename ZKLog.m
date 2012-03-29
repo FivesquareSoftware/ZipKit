@@ -16,7 +16,7 @@ NSString* const ZKLogToFileKey = @"ZKLogToFile";
 	if (level >= self.minimumLevel) {
 		va_list args;
 		va_start(args, format);
-		NSString *message = [[[NSString alloc] initWithFormat:format arguments:args] autorelease];
+		NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
 		va_end(args);
 		NSString *label = [self levelToLabel:level];
 		NSString *now = [self.dateFormatter stringFromDate:[NSDate date]];
@@ -84,14 +84,14 @@ static ZKLog *sharedInstance = nil;
 				
 				self.pid = [[NSProcessInfo processInfo] processIdentifier];
 				self.minimumLevel = ZKLogLevelError;
-				self.dateFormatter = [[NSDateFormatter new] autorelease];
+				self.dateFormatter = [NSDateFormatter new];
 				[self.dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];
 				
 				if ([[NSUserDefaults standardUserDefaults] boolForKey:ZKLogToFileKey]) {
 					NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 					NSString *libraryFolder = [searchPaths objectAtIndex:0];
 					NSString *logFolder = [libraryFolder stringByAppendingPathComponent:@"Logs"];
-					[[[NSFileManager new] autorelease] createDirectoryAtPath:logFolder withIntermediateDirectories:YES attributes:nil error:nil];
+					[[NSFileManager new] createDirectoryAtPath:logFolder withIntermediateDirectories:YES attributes:nil error:nil];
 					self.logFilePath = [logFolder stringByAppendingPathComponent:
 										[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"] 
 										 stringByAppendingPathExtension:@"log"]];
@@ -122,18 +122,10 @@ static ZKLog *sharedInstance = nil;
 	return self;
 }
 
-- (void) finalize {
-	if (self.logFilePointer)
-		fclose(self.logFilePointer);
-	[super finalize];
-}
 
 - (void) dealloc {
 	if (self.logFilePointer) 
 		fclose(self.logFilePointer);	
-	self.dateFormatter = nil;
-	self.logFilePath = nil;
-	[super dealloc];
 }
 
 @synthesize dateFormatter, pid, logFilePath, logFilePointer;

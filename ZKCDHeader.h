@@ -48,7 +48,7 @@
 @property (assign) NSUInteger versionNeededToExtract;
 @property (assign) NSUInteger generalPurposeBitFlag;
 @property (assign) NSUInteger compressionMethod;
-@property (retain) NSDate *lastModDate;
+@property  NSDate *lastModDate;
 @property (assign) NSUInteger crc;
 @property (assign) unsigned long long compressedSize;
 @property (assign) unsigned long long uncompressedSize;
@@ -60,8 +60,8 @@
 @property (assign) NSUInteger externalFileAttributes;
 @property (assign) unsigned long long localHeaderOffset;
 @property (copy) NSString *filename;
-@property (retain) NSData *extraField;
+@property  NSData *extraField;
 @property (copy) NSString *comment;
-@property (retain) NSMutableData *cachedData;
+@property  NSMutableData *cachedData;
 
 @end

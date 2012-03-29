@@ -50,7 +50,7 @@
 	NSString *fileNameBase = [[path lastPathComponent] stringByDeletingPathExtension];
 	NSString *ext = [path pathExtension];
 	NSUInteger i = 2;
-	NSFileManager *fm = [[NSFileManager new] autorelease];
+	NSFileManager *fm = [NSFileManager new];
 	while ([fm fileExistsAtPath:uniquePath]) {
 		uniquePath = [dir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %u", fileNameBase, i++]];
 		if (ext && [ext length] > 0)
@@ -64,7 +64,7 @@
 	BOOL rfFlag = [[userInfo objectForKey:ZKusingResourceForkKey] boolValue];
 	unsigned long long size = 0;
 	unsigned long long count = 0;
-	NSFileManager *fmgr = [[NSFileManager new] autorelease];
+	NSFileManager *fmgr = [NSFileManager new];
 	NSDictionary *dict = nil;
 	for (NSString *path in paths) {
 		dict = [fmgr zkTotalSizeAndItemCountAtPath:path usingResourceFork:rfFlag];
@@ -234,8 +234,8 @@
 		self.delegate = nil;
 		self.archivePath = nil;
 		self.centralDirectory = [NSMutableArray array];
-		self.fileManager = [[NSFileManager new] autorelease];
-		self.cdTrailer = [[ZKCDTrailer new] autorelease];
+		self.fileManager = [NSFileManager new];
+		self.cdTrailer = [ZKCDTrailer new];
 		self.throttleThreadSleepTime = 0.0;
 	}
 	return self;
@@ -244,11 +244,6 @@
 - (void) dealloc {
 	self.invoker = nil;
 	self.delegate = nil;
-	self.archivePath = nil;
-	self.centralDirectory = nil;
-	self.fileManager = nil;
-	self.cdTrailer = nil;
-	[super dealloc];
 }
 
 - (NSString *) description {

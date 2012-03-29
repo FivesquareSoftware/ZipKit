@@ -11,7 +11,7 @@
 
 + (NSDate *)zk_dateWithDosDate : (NSUInteger)dosDate {
 	NSUInteger date = (NSUInteger)(dosDate >> 16);
-	NSDateComponents *comps = [[NSDateComponents new] autorelease];
+	NSDateComponents *comps = [NSDateComponents new];
 	comps.year = ((date & 0x0FE00) / 0x0200) + 1980;
 	comps.month = (date & 0x1E0) / 0x20;
 	comps.day = date & 0x1f;

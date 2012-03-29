@@ -33,15 +33,9 @@
 	[self removeObserver:self forKeyPath:@"comment"];
 }
 
-- (void) finalize {
-	[self removeObservers];
-	[super finalize];
-}
 
 - (void) dealloc {
 	[self removeObservers];
-	self.comment = nil;
-	[super dealloc];
 }
 
 
@@ -54,7 +48,7 @@
 + (ZKCDTrailer *) recordWithData:(NSData *)data atOffset:(NSUInteger) offset {
 	NSUInteger mn = [data zk_hostInt32OffsetBy:&offset];
 	if (mn != ZKCDTrailerMagicNumber) return nil;
-	ZKCDTrailer *record = [[ZKCDTrailer new] autorelease];
+	ZKCDTrailer *record = [ZKCDTrailer new];
 	record.magicNumber = mn;
 	record.thisDiskNumber = [data zk_hostInt16OffsetBy:&offset];
 	record.diskNumberWithStartOfCentralDirectory = [data zk_hostInt16OffsetBy:&offset];

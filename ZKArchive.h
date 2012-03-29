@@ -10,16 +10,6 @@
 @class ZKCDTrailer;
 
 @interface ZKArchive : NSObject {
-@private
-	// invoker should be an NSOperation or NSThread; if [invoker isCancelled], inflation or deflation will be aborted
-	id __weak _invoker;
-	id __weak _delegate;
-	NSString *_archivePath;
-	NSMutableArray *_centralDirectory;
-	NSFileManager *_fileManager;
-	ZKCDTrailer *_cdTrailer;
-	NSTimeInterval _throttleThreadSleepTime;
-
 @protected
 	// cached respondsToSelector: checks
 	BOOL drtsDelegateWantsSizes;
@@ -58,12 +48,13 @@
 - (void) didUpdateTotalCount:(NSNumber *) count;
 - (void) didUpdateBytesWritten:(NSNumber *) byteCount;
 
-@property (assign, nonatomic) id __weak invoker;
-@property (assign, nonatomic) id __weak delegate;
+/** invoker should be an NSOperation or NSThread; if [invoker isCancelled], inflation or deflation will be aborted. */
+@property (weak, nonatomic) id invoker;
+@property (weak, nonatomic) id delegate;
 @property (copy) NSString *archivePath;
-@property (retain) NSMutableArray *centralDirectory;
-@property (retain) NSFileManager *fileManager;
-@property (retain) ZKCDTrailer *cdTrailer;
+@property (strong) NSMutableArray *centralDirectory;
+@property (strong) NSFileManager *fileManager;
+@property (strong) ZKCDTrailer *cdTrailer;
 @property (assign) NSTimeInterval throttleThreadSleepTime;
 @property (copy) NSString *comment;
 

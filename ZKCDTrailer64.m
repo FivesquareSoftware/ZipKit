@@ -27,7 +27,7 @@
 	if (!data) return nil;
 	NSUInteger mn = [data zk_hostInt32OffsetBy:&offset];
 	if (mn != ZKCDTrailer64MagicNumber) return nil;
-	ZKCDTrailer64 *record = [[ZKCDTrailer64 new] autorelease];
+	ZKCDTrailer64 *record = [ZKCDTrailer64 new];
 	record.magicNumber = mn;
 	record.sizeOfTrailer = [data zk_hostInt64OffsetBy:&offset];
 	record.versionMadeBy = [data zk_hostInt16OffsetBy:&offset];

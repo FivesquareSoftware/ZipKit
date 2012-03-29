@@ -56,19 +56,8 @@
 
 - (void) dealloc {
 	[self removeObservers];
-	self.cachedData = nil;
-	self.lastModDate = nil;
-	self.filename = nil;
-	self.extraField = nil;
-	self.comment = nil;
-	[super dealloc];
 }
 
-- (void) finalize {
-	self.cachedData = nil;
-	[self removeObservers];
-	[super finalize];
-}
 
 - (void) observeValueForKeyPath:(NSString *) keyPath ofObject:(id) object change:(NSDictionary *) change context:(void *) context {
 	if ([keyPath isEqualToString:@"compressedSize"]
@@ -88,7 +77,7 @@
 	if (!data) return nil;
 	NSUInteger mn = [data zk_hostInt32OffsetBy:&offset];
 	if (mn != ZKCDHeaderMagicNumber) return nil;
-	ZKCDHeader *record = [[ZKCDHeader new] autorelease];
+	ZKCDHeader *record = [ZKCDHeader new];
 	record.magicNumber = mn;
 	record.versionMadeBy = [data zk_hostInt16OffsetBy:&offset];
 	record.versionNeededToExtract = [data zk_hostInt16OffsetBy:&offset];
@@ -126,7 +115,7 @@
 	ZKCDHeader *record = [self recordWithData:fixedData atOffset:0];
 	if (record.filenameLength > 0) {
 		NSData *data = [file readDataOfLength:record.filenameLength];
-		record.filename = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+		record.filename = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	}
 	if (record.extraFieldLength > 0) {
 		record.extraField = [file readDataOfLength:record.extraFieldLength];
@@ -134,7 +123,7 @@
 	}
 	if (record.commentLength > 0) {
 		NSData *data = [file readDataOfLength:record.commentLength];
-		record.comment = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+		record.comment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	} else
 		record.comment = nil;
 

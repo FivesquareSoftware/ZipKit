@@ -183,7 +183,7 @@
 }
 
 + (ZKFileArchive *) archiveWithArchivePath:(NSString *)path {
-	ZKFileArchive *archive = [[ZKFileArchive new] autorelease];
+	ZKFileArchive *archive = [ZKFileArchive new];
 	archive.archivePath = path;
 	if ([archive.fileManager fileExistsAtPath:archive.archivePath]) {
 		archive.cdTrailer = [ZKCDTrailer recordWithArchivePath:path];
@@ -263,7 +263,7 @@
 	if ([cdHeader isSymLink]) {
 		// symbolic links are stored as uncompressed UTF-8-encoded string data in the archive
 		NSData *symLinkData = [archiveFile readDataOfLength:cdHeader.compressedSize];
-		NSString *symLinkDestinationPath = [[[NSString alloc] initWithData:symLinkData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *symLinkDestinationPath = [[NSString alloc] initWithData:symLinkData encoding:NSUTF8StringEncoding];
 		NSString *filename = [expansionDirectory stringByAppendingPathComponent:cdHeader.filename];
 		result = [self.fileManager createDirectoryAtPath:[path stringByDeletingLastPathComponent]
 							 withIntermediateDirectories:YES attributes:nil error:nil];
@@ -289,55 +289,55 @@
 			if (ret == Z_OK) {
 				NSFileHandle *inflatedFile = [NSFileHandle zk_newFileHandleForWritingAtPath:path];
 				unsigned char out[ZKZipBlockSize];
-				NSAutoreleasePool *pool = [NSAutoreleasePool new];
-				do {
-					chunkSize = MIN(ZKZipBlockSize, cdHeader.compressedSize - totalBytesRead);
-					[pool drain];
-					pool = [NSAutoreleasePool new];
-					deflatedData = [archiveFile readDataOfLength:chunkSize];
-					bytesRead = [deflatedData length];
-					totalBytesRead += bytesRead;
-					if (bytesRead > 0 && totalBytesRead <= cdHeader.compressedSize) {
-						strm.avail_in = bytesRead;
-						strm.next_in = (Bytef *)[deflatedData bytes];
-						do {
-							strm.avail_out = chunkSize;
-							strm.next_out = out;
-							ret = inflate(&strm, Z_SYNC_FLUSH);
-							if (ret != Z_STREAM_ERROR) {
-								have = (chunkSize - strm.avail_out);
-								crc = crc32(crc, out, have);
-								[inflatedFile writeData:[NSData dataWithBytesNoCopy:out length:have freeWhenDone:NO]];
-								bytesWritten += have;
+				@autoreleasepool {
+					do {
+						chunkSize = MIN(ZKZipBlockSize, cdHeader.compressedSize - totalBytesRead);
+						@autoreleasepool {
+							deflatedData = [archiveFile readDataOfLength:chunkSize];
+							bytesRead = [deflatedData length];
+							totalBytesRead += bytesRead;
+							if (bytesRead > 0 && totalBytesRead <= cdHeader.compressedSize) {
+								strm.avail_in = bytesRead;
+								strm.next_in = (Bytef *)[deflatedData bytes];
+								do {
+									strm.avail_out = chunkSize;
+									strm.next_out = out;
+									ret = inflate(&strm, Z_SYNC_FLUSH);
+									if (ret != Z_STREAM_ERROR) {
+										have = (chunkSize - strm.avail_out);
+										crc = crc32(crc, out, have);
+										[inflatedFile writeData:[NSData dataWithBytesNoCopy:out length:have freeWhenDone:NO]];
+										bytesWritten += have;
+									} else
+										ZKLogError(@"Stream error: %@", path);
+									if (irtsIsCancelled) {
+										if ([self.invoker isCancelled]) {
+											@autoreleasepool {
+												[inflatedFile closeFile];
+												if (self.delegate)
+													[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
+												[archiveFile closeFile];
+												return zkCancelled;
+											}
+										}
+									}
+								} while (strm.avail_out == 0 && ret != Z_STREAM_ERROR);
 							} else
-								ZKLogError(@"Stream error: %@", path);
-							if (irtsIsCancelled) {
-								if ([self.invoker isCancelled]) {
-									[inflatedFile closeFile];
-									if (self.delegate)
-										[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
-									[archiveFile closeFile];
-									[pool drain];
-									return zkCancelled;
+								ret = Z_STREAM_END;
+							if ([self delegateWantsSizes]) {
+								if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
+									if ([NSThread isMainThread])
+										[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
+									else
+										[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
+															   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
+									bytesWritten = 0;
 								}
 							}
-						} while (strm.avail_out == 0 && ret != Z_STREAM_ERROR);
-					} else
-						ret = Z_STREAM_END;
-					if ([self delegateWantsSizes]) {
-						if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
-							if ([NSThread isMainThread])
-								[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
-							else
-								[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
-													   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
-							bytesWritten = 0;
+							[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
 						}
-					}
-					[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
-				} while (ret != Z_STREAM_END && ret != Z_STREAM_ERROR);
-				[pool drain];
-				pool = nil;
+					} while (ret != Z_STREAM_END && ret != Z_STREAM_ERROR);
+				}
 				if ([self delegateWantsSizes]) {
 					if ([NSThread isMainThread])
 						[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
@@ -356,43 +356,46 @@
 		} else if (cdHeader.compressionMethod == Z_NO_COMPRESSION) {
 			if (totalBytesRead <= cdHeader.compressedSize) {
 				NSFileHandle *inflatedFile = [NSFileHandle zk_newFileHandleForWritingAtPath:path];
-				NSAutoreleasePool *pool = [NSAutoreleasePool new];
-				do {
-					chunkSize = MIN(ZKZipBlockSize, cdHeader.compressedSize - totalBytesRead);
-					deflatedData = [archiveFile readDataOfLength:chunkSize];
-					bytesRead = [deflatedData length];
-					totalBytesRead += bytesRead;
-					
-					[inflatedFile writeData:deflatedData];
-					bytesWritten += bytesRead;
-					crc = [deflatedData zk_crc32:crc];
 
-					[pool drain];
-					pool = [NSAutoreleasePool new];
+				@autoreleasepool {
+					do {
+						@autoreleasepool {
+							chunkSize = MIN(ZKZipBlockSize, cdHeader.compressedSize - totalBytesRead);
+							deflatedData = [archiveFile readDataOfLength:chunkSize];
+							bytesRead = [deflatedData length];
+							totalBytesRead += bytesRead;
+							
+							[inflatedFile writeData:deflatedData];
+							bytesWritten += bytesRead;
+							crc = [deflatedData zk_crc32:crc];
+						}
+						@autoreleasepool {
+							if ([self delegateWantsSizes]) {
+								if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
+									if ([NSThread isMainThread])
+										[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
+									else
+										[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
+															   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
+									bytesWritten = 0;
+								}
+							}
+							[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
+							if (irtsIsCancelled) {
+								if ([self.invoker isCancelled]) {
+									@autoreleasepool {
+										[inflatedFile closeFile];
+										if (self.delegate)
+											[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
+										[archiveFile closeFile];
+										return zkCancelled;
+									}
+								}
+							}
+						}						
+					} while (totalBytesRead < cdHeader.compressedSize);
+				}
 
-					if ([self delegateWantsSizes]) {
-						if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
-							if ([NSThread isMainThread])
-								[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
-							else
-								[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
-													   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
-							bytesWritten = 0;
-						}
-					}
-					[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
-					if (irtsIsCancelled) {
-						if ([self.invoker isCancelled]) {
-							[inflatedFile closeFile];
-							if (self.delegate)
-								[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
-							[archiveFile closeFile];
-							[pool drain];
-							return zkCancelled;
-						}
-					}
-				} while (totalBytesRead < cdHeader.compressedSize);
-				[pool drain];
 				[inflatedFile closeFile];
 				if (cdHeader.crc != crc) {
 					ret = Z_DATA_ERROR;
@@ -479,7 +482,7 @@
 	}
 
 	// create the local file header for the file
-	ZKLFHeader *lfHeaderData = [[ZKLFHeader new] autorelease];
+	ZKLFHeader *lfHeaderData = [ZKLFHeader new];
 	lfHeaderData.uncompressedSize = [self.fileManager zk_dataSizeAtFilePath:path];
 	lfHeaderData.lastModDate = [self.fileManager zk_modificationDateForPath:path];
 	lfHeaderData.filename = relativePath;
@@ -530,92 +533,93 @@
 			unsigned char out[ZKZipBlockSize];
 			unsigned long long compressedSize = 0, block = 0, bytesWritten = 0;
 			NSUInteger flush, have, crc = 0;
-			NSAutoreleasePool *pool = [NSAutoreleasePool new];
-			do {
-				[pool drain];
-				pool = [NSAutoreleasePool new];
-				fileData = [file readDataOfLength:ZKZipBlockSize];
-				strm.avail_in = [fileData length];
-				bytesWritten += strm.avail_in;
-				flush = Z_FINISH;
-				if (strm.avail_in > 0) {
-					flush = Z_SYNC_FLUSH;
-					strm.next_in = (Bytef *)[fileData bytes];
-					crc = crc32(crc, strm.next_in, strm.avail_in);
-				}
+
+			@autoreleasepool {
 				do {
-					strm.avail_out = ZKZipBlockSize;
-					strm.next_out = out;
-					ret = deflate(&strm, flush);
-					if (ret != Z_STREAM_ERROR) {
-						have = (ZKZipBlockSize - strm.avail_out);
-						compressedSize += have;
-						archiveData = [NSData dataWithBytesNoCopy:out length:have freeWhenDone:NO];
-						[archiveFile writeData:archiveData];
-						if (irtsIsCancelled) {
-							if ([self.invoker isCancelled]) {
+					@autoreleasepool {
+						fileData = [file readDataOfLength:ZKZipBlockSize];
+						strm.avail_in = [fileData length];
+						bytesWritten += strm.avail_in;
+						flush = Z_FINISH;
+						if (strm.avail_in > 0) {
+							flush = Z_SYNC_FLUSH;
+							strm.next_in = (Bytef *)[fileData bytes];
+							crc = crc32(crc, strm.next_in, strm.avail_in);
+						}
+						do {
+							@autoreleasepool {
+								strm.avail_out = ZKZipBlockSize;
+								strm.next_out = out;
+								ret = deflate(&strm, flush);
+								if (ret != Z_STREAM_ERROR) {
+									have = (ZKZipBlockSize - strm.avail_out);
+									compressedSize += have;
+									archiveData = [NSData dataWithBytesNoCopy:out length:have freeWhenDone:NO];
+									[archiveFile writeData:archiveData];
+									if (irtsIsCancelled) {
+										if ([self.invoker isCancelled]) {
+											[file closeFile];
+											[archiveFile closeFile];
+											if (self.delegate)
+												[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
+											return zkCancelled;
+										}
+									}
+								} else {
+									ZKLogError(@"Error in deflate");
+									[file closeFile];
+									[archiveFile closeFile];
+									return zkFailed;
+								}
+							}
+						} while (strm.avail_out == 0);
+						if (strm.avail_in != 0) {
+							@autoreleasepool {
+								ZKLogError(@"All input not used");
 								[file closeFile];
 								[archiveFile closeFile];
-								if (self.delegate)
-									[self performSelectorOnMainThread:@selector(didCancel) withObject:nil waitUntilDone:NO];
-								[pool drain];
-								return zkCancelled;
+								return zkFailed;
 							}
 						}
-					} else {
-						ZKLogError(@"Error in deflate");
-						[file closeFile];
+						if ([self delegateWantsSizes]) {
+							if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
+								if ([NSThread isMainThread])
+									[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
+								else
+									[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
+														   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
+								bytesWritten = 0;
+							}
+						}
+						[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
+					}
+				} while (flush != Z_FINISH);
+				deflateEnd(&strm);
+				[file closeFile];
+				if ([self delegateWantsSizes]) {
+					if ([NSThread isMainThread])
+						[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
+					else
+						[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
+											   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
+				}
+				if (ret != Z_STREAM_END) {
+					@autoreleasepool {
+						ZKLogError(@"Stream incomplete");
 						[archiveFile closeFile];
-						[pool drain];
 						return zkFailed;
 					}
-				} while (strm.avail_out == 0);
-				if (strm.avail_in != 0) {
-					ZKLogError(@"All input not used");
-					[file closeFile];
-					[archiveFile closeFile];
-					[pool drain];
-					return zkFailed;
 				}
-				if ([self delegateWantsSizes]) {
-					if (ZKNotificationIterations > 0 && ++block % ZKNotificationIterations == 0) {
-						if ([NSThread isMainThread])
-							[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
-						else
-							[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
-												   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
-						bytesWritten = 0;
-					}
-				}
-				[NSThread sleepForTimeInterval:self.throttleThreadSleepTime];
-			} while (flush != Z_FINISH);
-			deflateEnd(&strm);
-			[file closeFile];
-			if ([self delegateWantsSizes]) {
-				if ([NSThread isMainThread])
-					[self didUpdateBytesWritten:[NSNumber numberWithUnsignedLongLong:bytesWritten]];
-				else
-					[self performSelectorOnMainThread:@selector(didUpdateBytesWritten:)
-										   withObject:[NSNumber numberWithUnsignedLongLong:bytesWritten] waitUntilDone:NO];
+				
+				// replace the local file header's default values with those calculated during deflation
+				lfHeaderData.crc = crc;
+				lfHeaderData.compressedSize = compressedSize;
 			}
-			if (ret != Z_STREAM_END) {
-				ZKLogError(@"Stream incomplete");
-				[archiveFile closeFile];
-				[pool drain];
-				return zkFailed;
-			}
-
-			// replace the local file header's default values with those calculated during deflation
-			lfHeaderData.crc = crc;
-			lfHeaderData.compressedSize = compressedSize;
-
-			[pool drain];
-			pool = nil;
 		}
 	}
 
 	// create the central directory header and add it to central directory
-	ZKCDHeader *dataCDHeader = [[ZKCDHeader new] autorelease];
+	ZKCDHeader *dataCDHeader = [ZKCDHeader new];
 	dataCDHeader.uncompressedSize = lfHeaderData.uncompressedSize;
 	dataCDHeader.lastModDate = lfHeaderData.lastModDate;
 	dataCDHeader.crc = lfHeaderData.crc;
@@ -643,7 +647,7 @@
 		if (appleDoubleData) {
 			NSData *deflatedData = [appleDoubleData zk_deflate];
 
-			ZKLFHeader *lfHeaderResource = [[ZKLFHeader new] autorelease];
+			ZKLFHeader *lfHeaderResource = [ZKLFHeader new];
 			lfHeaderResource.uncompressedSize = [appleDoubleData length];
 			lfHeaderResource.lastModDate = lfHeaderData.lastModDate;
 			lfHeaderResource.filename = [[ZKMacOSXDirectory stringByAppendingPathComponent:
@@ -654,7 +658,7 @@
 			lfHeaderResource.crc = [appleDoubleData zk_crc32];
 			lfHeaderResource.compressedSize = [deflatedData length];
 
-			ZKCDHeader *resourceCDHeader = [[ZKCDHeader new] autorelease];
+			ZKCDHeader *resourceCDHeader = [ZKCDHeader new];
 			resourceCDHeader.uncompressedSize = lfHeaderResource.uncompressedSize;
 			resourceCDHeader.lastModDate = lfHeaderResource.lastModDate;
 			resourceCDHeader.crc = lfHeaderResource.crc;
@@ -680,14 +684,14 @@
 	// write the central directory to the archive
 	self.useZip64Extensions = (self.useZip64Extensions || [self.cdTrailer useZip64Extensions]);
 	if (self.useZip64Extensions) {
-		ZKCDTrailer64 *cdTrailer64 = [[ZKCDTrailer64 new] autorelease];
+		ZKCDTrailer64 *cdTrailer64 = [ZKCDTrailer64 new];
 		cdTrailer64.numberOfCentralDirectoryEntriesOnThisDisk = self.cdTrailer.numberOfCentralDirectoryEntriesOnThisDisk;
 		cdTrailer64.totalNumberOfCentralDirectoryEntries = self.cdTrailer.totalNumberOfCentralDirectoryEntries;
 		cdTrailer64.sizeOfCentralDirectory = self.cdTrailer.sizeOfCentralDirectory;
 		cdTrailer64.offsetOfStartOfCentralDirectory = [archiveFile offsetInFile];
 		for (ZKCDHeader *cdHeader in self.centralDirectory)
 			[archiveFile writeData:[cdHeader data]];
-		ZKCDTrailer64Locator *cdTrailer64Locator = [[ZKCDTrailer64Locator new] autorelease];
+		ZKCDTrailer64Locator *cdTrailer64Locator = [ZKCDTrailer64Locator new];
 		cdTrailer64Locator.offsetOfStartOfCentralDirectoryTrailer64 = [archiveFile offsetInFile];
 		[archiveFile writeData:[cdTrailer64 data]];
 		[archiveFile writeData:[cdTrailer64Locator data]];

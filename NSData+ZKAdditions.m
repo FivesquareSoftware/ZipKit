@@ -47,7 +47,7 @@
 	NSString *value = nil;
 	NSData *subData = [self subdataWithRange:NSMakeRange(*offset, length)];
 	if (length > 0)
-		value = [[[NSString alloc] initWithData:subData encoding:NSUTF8StringEncoding] autorelease];
+		value = [[NSString alloc] initWithData:subData encoding:NSUTF8StringEncoding];
 	if (!value) {
 		// No valid utf8 encoding, replace everything non-ascii with '?'
 		NSMutableData *md = [subData mutableCopyWithZone:nil];
@@ -56,9 +56,8 @@
 			for (unsigned int i = 0; i < [md length]; i++)
 				if (mdd[i] > 127)
 					mdd[i] = '?';
-			value = [[[NSString alloc] initWithData:md encoding:NSUTF8StringEncoding] autorelease];
+			value = [[NSString alloc] initWithData:md encoding:NSUTF8StringEncoding];
 		}
-		[md release];
 	}
 	*offset += length;
 	return value;

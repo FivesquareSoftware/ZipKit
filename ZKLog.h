@@ -44,7 +44,7 @@ extern NSString* const ZKLogToFileKey;
 + (ZKLog *) sharedInstance;
 
 @property (assign) NSUInteger minimumLevel;
-@property (retain) NSDateFormatter *dateFormatter;
+@property (strong) NSDateFormatter *dateFormatter;
 @property (assign) int pid;
 @property (copy) NSString *logFilePath;
 @property (assign) FILE *logFilePointer;

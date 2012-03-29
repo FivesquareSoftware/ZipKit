@@ -23,7 +23,7 @@
 + (ZKCDTrailer64Locator *) recordWithData:(NSData *)data atOffset:(NSUInteger) offset {
 	NSUInteger mn = [data zk_hostInt32OffsetBy:&offset];
 	if (mn != ZKCDTrailer64LocatorMagicNumber) return nil;
-	ZKCDTrailer64Locator *record = [[ZKCDTrailer64Locator new] autorelease];
+	ZKCDTrailer64Locator *record = [ZKCDTrailer64Locator new];
 	record.magicNumber = mn;
 	record.diskNumberWithStartOfCentralDirectory = [data zk_hostInt32OffsetBy:&offset];
 	record.offsetOfStartOfCentralDirectoryTrailer64 = [data zk_hostInt64OffsetBy:&offset];

@@ -26,7 +26,7 @@
 - (NSInteger) deflateFile:(NSString *) path relativeToPath:(NSString *) basePath usingResourceFork:(BOOL) rfFlag;
 - (NSInteger) deflateData:(NSData *)data withFilename:(NSString *) filename andAttributes:(NSDictionary *) fileAttributes;
 
-@property (retain) NSMutableData *data;
-@property (retain) NSMutableArray *inflatedFiles;
+@property  NSMutableData *data;
+@property  NSMutableArray *inflatedFiles;
 
 @end
