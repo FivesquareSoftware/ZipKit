@@ -102,14 +102,14 @@
 		fileType = NSFileTypeRegular;
 	}
 	
-	if (inflatedData)
-		*fileAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-						   [cdHeader posixPermissions], NSFilePosixPermissions,
-						   [cdHeader lastModDate], NSFileCreationDate,
-						   [cdHeader lastModDate], NSFileModificationDate,
-						   fileType, NSFileType, nil];
-	else
-		*fileAttributes = nil;
+	NSMutableDictionary *attributes = inflatedData == nil ? nil : [NSDictionary dictionaryWithObjectsAndKeys:
+																  [cdHeader posixPermissions], NSFilePosixPermissions,
+																  [cdHeader lastModDate], NSFileCreationDate,
+																  [cdHeader lastModDate], NSFileModificationDate,
+																  fileType, NSFileType, nil];
+	if (fileAttributes) {
+		*fileAttributes = attributes;
+	}
 	
 	return inflatedData;
 }
