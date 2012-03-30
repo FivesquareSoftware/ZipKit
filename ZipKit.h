@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ZipKit : NSObject
+#import "ZKDefs.h"
+#import "ZKArchive.h"
+#import "ZKDataArchive.h"
+#import "ZKFileArchive.h"
 
-@end
+#import "ZKCDHeader.h"
+#import "ZKCDTrailer.h"

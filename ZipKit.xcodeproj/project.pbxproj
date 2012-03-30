@@ -11,6 +11,9 @@
 		A44EEF1B1525160100A61C67 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1A1525160100A61C67 /* CoreServices.framework */; };
 		A44EEF1D1525161E00A61C67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1C1525161D00A61C67 /* Foundation.framework */; };
 		A44EEF1F1525162400A61C67 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1E1525162400A61C67 /* libz.dylib */; };
+		A4BA484B15251EB900748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A4BA484D15251F6A00748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A4BA484E15251F6A00748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB9B9A24109F63AC003E3F8B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		CB9B9B0B109F643D003E3F8B /* GMAppleDouble.h in Headers */ = {isa = PBXBuildFile; fileRef = CB9B9B08109F643D003E3F8B /* GMAppleDouble.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB9B9B0C109F643D003E3F8B /* GMAppleDouble.m in Sources */ = {isa = PBXBuildFile; fileRef = CB9B9B09109F643D003E3F8B /* GMAppleDouble.m */; };
@@ -119,6 +122,7 @@
 		A44EEF1A1525160100A61C67 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/CoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		A44EEF1C1525161D00A61C67 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A44EEF1E1525162400A61C67 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
+		A4BA484915251EB900748EF9 /* ZipKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipKit.h; sourceTree = "<group>"; };
 		CB2E990A10A1C5BB00E04C37 /* ZipKit Touch.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ZipKit Touch.xcodeproj"; path = "Demo Projects/ZipKit Touch - iPhone App/ZipKit Touch.xcodeproj"; sourceTree = "<group>"; };
 		CB2E991410A1C5C500E04C37 /* ZipKit Utility.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "ZipKit Utility.xcodeproj"; path = "Demo Projects/ZipKit Utility - Mac OS X App/ZipKit Utility.xcodeproj"; sourceTree = "<group>"; };
 		CB2E991E10A1C5CF00E04C37 /* zku.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zku.xcodeproj; path = "Demo Projects/zku - Mac OS X Tool/zku.xcodeproj"; sourceTree = "<group>"; };
@@ -232,6 +236,7 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				A4BA484915251EB900748EF9 /* ZipKit.h */,
 				CB9B9B41109F64A0003E3F8B /* ZKDefs.h */,
 				CB9B9B42109F64A0003E3F8B /* ZKDefs.m */,
 				CB9B9B59109F64AE003E3F8B /* Archive Objects */,
@@ -424,6 +429,7 @@
 				CB9B9B53109F64A0003E3F8B /* ZKDefs.h in Headers */,
 				CB9B9B55109F64A0003E3F8B /* ZKFileArchive.h in Headers */,
 				CB9B9B57109F64A0003E3F8B /* ZKLFHeader.h in Headers */,
+				A4BA484B15251EB900748EF9 /* ZipKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +437,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4BA484D15251F6A00748EF9 /* ZipKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -438,6 +445,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4BA484E15251F6A00748EF9 /* ZipKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
