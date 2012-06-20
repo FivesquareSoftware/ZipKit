@@ -675,7 +675,7 @@
 				GCC_PREFIX_HEADER = ZipKit_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "ZipKitFW-Info.plist";
-				INSTALL_PATH = "@rpath//Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = ZipKit;
 				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;
@@ -696,7 +696,7 @@
 				GCC_PREFIX_HEADER = ZipKit_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "ZipKitFW-Info.plist";
-				INSTALL_PATH = "@rpath//Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = ZipKit;
 				SDKROOT = macosx10.7;
 				WRAPPER_EXTENSION = framework;

@@ -114,7 +114,7 @@
 	return inflatedData;
 }
 
-- (NSUInteger) inflateInFolder:(NSString *)enclosingFolder withFolderName:(NSString *)folderName usingResourceFork:(BOOL) rfFlag {
+- (NSInteger) inflateInFolder:(NSString *)enclosingFolder withFolderName:(NSString *)folderName usingResourceFork:(BOOL) rfFlag {
 	if ([self inflateAll] != zkSucceeded)
 		return zkFailed;
 	if ([self.inflatedFiles count] < 1)
