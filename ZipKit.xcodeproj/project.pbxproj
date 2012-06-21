@@ -10,7 +10,6 @@
 		A44EEF19152515F800A61C67 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF18152515F800A61C67 /* libz.dylib */; };
 		A44EEF1B1525160100A61C67 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1A1525160100A61C67 /* CoreServices.framework */; };
 		A44EEF1D1525161E00A61C67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1C1525161D00A61C67 /* Foundation.framework */; };
-		A44EEF1F1525162400A61C67 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A44EEF1E1525162400A61C67 /* libz.dylib */; };
 		A4BA484B15251EB900748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A4BA484D15251F6A00748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A4BA484E15251F6A00748EF9 /* ZipKit.h in Headers */ = {isa = PBXBuildFile; fileRef = A4BA484915251EB900748EF9 /* ZipKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -192,7 +191,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A44EEF1F1525162400A61C67 /* libz.dylib in Frameworks */,
 				A44EEF1D1525161E00A61C67 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
