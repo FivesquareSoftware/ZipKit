@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat"
+
 //
 //  ZKArchive.m
 //  ZipKit
@@ -254,3 +257,5 @@
 @dynamic comment;
 
 @end
+
+#pragma clang diagnostic pop

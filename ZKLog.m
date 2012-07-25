@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat"
+
 //
 //  ZKLog.m
 //  ZipKit
@@ -132,3 +135,5 @@ static ZKLog *sharedInstance = nil;
 @dynamic minimumLevel;
 
 @end
+
+#pragma clang dignostic pop
