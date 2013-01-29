@@ -786,7 +786,7 @@
 				GCC_PREFIX_HEADER = ZipKit_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = touchzipkit;
 				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(PRODUCT_NAME)";
